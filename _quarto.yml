@@ -10,23 +10,23 @@ website:
   description: "A personal website"
   site-url: https://rorylawless.com
   title: "Rory Lawless"
-  repo-url: https://codeberg.org/RoryLawless/website/
+  repo-url: https://github.com/rorsome/website
   page-footer:
     background: "#fbf5f5"
     foreground: "#070a0c"
-    center: "Made with [Quarto](https://quarto.org/) in DC.
-    
-
-    [Website](https://rorylawless.com/) © 2026 by [Rory
-    Lawless](about.qmd) is licensed under [CC
-    BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)."
+    center: "Made with [Quarto](https://quarto.org/) in DC.<br>
+    [Website](https://rorylawless.com/) © 2026 by [Rory Lawless](about.qmd) is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)."
   search: false
   draft-mode: gone
   navbar:
     background: "#24617a"
     foreground: "#fbf5f5"
     right:
-      - icon: envelope-heart-fill
+      - icon: file-earmark-person-fill
+        href: resume.qmd
+        aria-label: "Rory's Resume"
+        text: " "
+      - icon: envelope-at-fill
         href: mailto:rory@rorylawless.com
         aria-label: "Email Rory"
       - icon: bluesky
@@ -35,18 +35,9 @@ website:
       - icon: linkedin
         href: https://www.linkedin.com/in/rory-lawless/
         aria-label: "Rory's LinkedIn"
-      - icon: git
-        href: https://codeberg.org/RoryLawless/
-        aria-label: "Rory's Codeberg"
-      - icon: file-person-fill
-        aria-label: "More about Rory"
-        menu:
-          - text: "About"
-            href: about.qmd
-            aria-label: "About Rory"
-          - text: "Resume"
-            href: resume.qmd
-            aria-label: "Rory's Resume"
+      - icon: github
+        href: https://github.com/RoryLawless
+        aria-label: "Rory's GitHub"
 format:
   html:
     theme:
