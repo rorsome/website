@@ -12,13 +12,17 @@ jobs:
       - uses: quarto-dev/quarto-actions/render@v2
         with:
           to: _site
-      - uses: actions/cache@v4
+      - uses: useblacksmith/setup-node@v5
+        with:
+          node-version: 25
+          cache: "npm"
+      - uses: useblacksmith/cache@v5
         with:
           path: |
             _freeze
-          key: quarto-cache-${{ hashFiles('**/*.json', '**/*.js'') }}
+          key: ${{ runner.os }}-freeze-${{ hashFiles('**/*.json', '**/*.js') }}
           restore-keys: |
-            quarto-cache-
+            ${{ runner.os }}-freeze-
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
