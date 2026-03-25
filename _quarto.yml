@@ -6,6 +6,7 @@ project:
   resources:
     - .well-known/
     - _redirects
+    - _headers
 website:
   description: "A personal website"
   site-url: https://rorylawless.com
