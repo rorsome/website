@@ -7,22 +7,13 @@ jobs:
   deploy:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
-      - uses: actions/checkout@v4
-      - uses: quarto-dev/quarto-actions/setup@v2
-      - uses: quarto-dev/quarto-actions/render@v2
-        with:
-          to: _site
-      - uses: useblacksmith/setup-node@v5
-        with:
-          node-version: 25
-          cache: "npm"
-      - uses: useblacksmith/cache@v5
-        with:
-          path: |
-            _freeze
-          key: ${{ runner.os }}-freeze-${{ hashFiles('**/*.json', '**/*.js') }}
-          restore-keys: |
-            ${{ runner.os }}-freeze-
-      - uses: cloudflare/wrangler-action@v3
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Setup Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+      - name: Render website
+        uses: quarto-dev/quarto-actions/render@v2
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
