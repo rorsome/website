@@ -4,7 +4,7 @@ date: 2026-01-02
 format: html
 ---
 
-If you’re like me, you’ve stored your API keys in your .Renviron file and forget about them. Not only is it risky to store them in plaintext, it’s also a nightmarish way to manage and rotate out keys when needed.
+If you're like me, you've stored your API keys in your .Renviron file and forget about them. Not only is it risky to store them in plaintext, it's also a nightmarish way to manage and rotate out keys when needed.
 
 ## 1Password to the rescue
 

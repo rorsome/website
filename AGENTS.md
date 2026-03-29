@@ -27,14 +27,16 @@ A personal website at [rorylawless.com](https://rorylawless.com). It is a static
 
 ```
 _quarto.yml          # Master site configuration (colors, fonts, navbar, output dir)
+drafts.yml           # Controls draft post visibility (referenced by _quarto.yml)
 assets/
   custom.scss        # All custom styles — primary target for look and feel changes
   template.ejs       # EJS template for the post listing on the homepage
 html/
   analytics.html     # Simple Analytics script injection
 posts/               # Blog posts, each in its own subdirectory with index.qmd
-  _metadata.yml      # Shared frontmatter defaults for all posts
-.well-known/         # PGP key and security.txt
+  _metadata.yml      # Shared frontmatter defaults for all posts (freeze: auto)
+404.qmd              # Custom 404 page
+.well-known/         # PGP key (pgp-key.txt) and security.txt
 _redirects           # Cloudflare redirect rules
 _headers             # Cloudflare response header rules
 wrangler.jsonc       # Cloudflare Workers deployment config
@@ -44,7 +46,7 @@ renv.lock            # Locked R package versions
   deploy.yml         # Build and deploy pipeline
 ```
 
-Output goes to `_site/` (generated, not committed). The `_freeze/` directory caches R code execution results and is committed.
+Output goes to `_site/` (generated, not committed). The `_freeze/` directory (computational cache) is also not committed — it is restored from the GitHub Actions cache between runs.
 
 ---
 
@@ -52,32 +54,59 @@ Output goes to `_site/` (generated, not committed). The `_freeze/` directory cac
 
 **Colors** (defined in `_quarto.yml`):
 - Navbar background: `#24617a` (teal)
-- Navbar / footer text: `#fbf5f5` (off-white)
+- Navbar foreground / text: `#fbf5f5` (off-white)
+- Page background: `#fbf5f5` (off-white)
+- Footer background: `#fbf5f5`, foreground: `#070a0c`
 - Body text: `#070a0c`
 - Links: `#183e4d`
 
-**Fonts** (loaded from Google Fonts in `assets/custom.scss`):
-- Body: Lato
-- Navbar title: Playfair Display
+**Typography** (defined in `_quarto.yml` and loaded via Google Fonts in `assets/custom.scss`):
+- Body font: Lato, 14pt
+- Navbar title: Playfair Display (applied via `.navbar-title` in SCSS)
+- Code highlighting: a11y style, with copy buttons enabled
 
-**Layout**: Max content width is controlled via `.navbar-container { width: 820px }` in `custom.scss`. The navbar title uses `font-size: 4vw` (viewport-relative).
+**Layout** (`assets/custom.scss`):
+- Max content width: `.navbar-container { width: 820px }` (viewport-capped)
+- Navbar title size: `font-size: 4vw` (viewport-relative)
+- `h2` elements: no bottom border, no bottom padding, 1rem top margin
+- Table cells: zero padding via `.table> :not(caption)>*>*`
+- Post listing: borderless table; date column is right-aligned
+
+**Post listing** (`assets/template.ejs`):
+- Renders title (hyperlinked) and ISO date in a two-column borderless table
+- Sorted by date descending; no categories, search, filters, or sort UI
 
 When changing look and feel, `assets/custom.scss` and `_quarto.yml` are the two files to focus on. Do not introduce a Quarto theme — the site intentionally uses `theme: none`.
 
 ---
 
+## Key `_quarto.yml` settings
+
+- `llms-txt: true` — Quarto generates an `llms.txt` file for LLM consumption
+- `email-obfuscation: references` — email addresses are obfuscated in rendered HTML
+- `draft-mode: gone` (set in `drafts.yml`, referenced via `metadata-files`) — drafts are fully excluded from output
+- `search: false` — site-wide search is disabled intentionally
+- `feed: true` (set in `index.qmd`) — an RSS feed is generated for the post listing
+- `anchor-sections: false` (set in `index.qmd`) — no anchor links on the homepage
+
+---
+
 ## Build and deploy
 
-The site is never built locally — CI handles it. The full pipeline on push to `main`:
+The site is **never built locally** — CI handles it. The full pipeline runs on every push to `main`:
 
-1. Restore cached `_freeze/` and `node_modules/`
+1. Restore cached `_freeze/` and `node_modules/` (keyed by OS + hash of `package-lock.json` and all `.qmd` files)
 2. Set up R + renv (restores packages from `renv.lock`)
 3. Run `quarto render` → outputs to `_site/`
 4. Run `wrangler deploy` → uploads `_site/` to Cloudflare Workers
 
-Secrets required: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN` (stored in GitHub Actions).
+**Runner**: `blacksmith-4vcpu-ubuntu-2404-arm` (4-core ARM Ubuntu 24.04)
 
-To preview changes locally you would need Quarto and R installed, then `quarto preview`. Agents working in this environment should not attempt to run the full build.
+**Secrets required**: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN` (stored in GitHub Actions).
+
+**Paths that do not trigger a deploy**: Changes to `README.md`, `AGENTS.md`, `CLAUDE.md`, `.gitignore`, and anything under `.claude/` are excluded via `paths-ignore`. Edits to those files alone will not trigger a build.
+
+To preview changes locally you would need Quarto and R installed, then run `quarto preview`. Agents in this environment should not attempt to run the full build.
 
 ---
 
@@ -85,12 +114,12 @@ To preview changes locally you would need Quarto and R installed, then `quarto p
 
 `wrangler.jsonc` defines:
 - Static assets served from `_site/`
-- `not_found_handling: "single-page-application"` — all 404s fall back to `index.html`
-- `html_handling: "auto-trailing-slash"` — URL normalisation
+- `not_found_handling: "404-page"` — unmatched routes serve the rendered `404.html`
+- `html_handling: "auto-trailing-slash"` — URL normalisation (nested under `assets`)
 - `placement: { mode: "smart" }` — Cloudflare automatic edge placement
 - Custom domain: `rorylawless.com`
 
-URL redirects live in `_redirects` (Cloudflare syntax). Response headers live in `_headers`.
+URL redirects live in `_redirects` (Cloudflare syntax). Response headers live in `_headers` — currently used to set CORS headers and `Content-Type` for the PGP key endpoint at `/.well-known/openpgpkey/`.
 
 ---
 
@@ -98,9 +127,9 @@ URL redirects live in `_redirects` (Cloudflare syntax). Response headers live in
 
 - Post directories use kebab-case naming (e.g., `posts/the-basics-of-duckdb-in-r/`)
 - Dates throughout are ISO 8601 (`2025-03-30`)
-- Reusable content snippets use Quarto's `{{< include >}}` shortcode
-- Draft posts are hidden via `drafts: gone` in `_quarto.yml`
-- Do not add search, categories, or sort UI to the post listing — the site is intentionally minimal
+- Reusable content snippets use Quarto's `{{< include >}}` shortcode (e.g., `_about-short.qmd` is included in `index.qmd`)
+- All posts inherit settings from `posts/_metadata.yml` (`freeze: auto`, ISO date format)
+- Draft visibility is controlled exclusively via `drafts.yml` — do not edit `_quarto.yml` for this
 
 ---
 
@@ -108,6 +137,7 @@ URL redirects live in `_redirects` (Cloudflare syntax). Response headers live in
 
 - Do not introduce a Quarto theme (Bootstrap-based) — styling is intentionally from scratch
 - Do not add JavaScript frameworks or bundlers
-- Do not commit the `_site/` output directory
+- Do not commit the `_site/` or `_freeze/` output directories — both are in `.gitignore`
 - Do not edit `.qmd` content files — content is out of scope for agents
 - Do not modify `renv.lock` manually — R package changes go through `renv`
+- Do not add search, categories, or sort UI to the post listing — the site is intentionally minimal
