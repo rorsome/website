@@ -12,11 +12,12 @@ website:
   site-url: https://rorylawless.com
   title: "Rory Lawless"
   repo-url: https://github.com/rorsome/website
+  llms-txt: true
   page-footer:
     background: "#fbf5f5"
     foreground: "#070a0c"
-    center: "Made with [Quarto](https://quarto.org/) in DC.<br>
-    [Website](https://rorylawless.com/) © 2026 by [Rory Lawless](about.qmd) is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)."
+    center: |
+      Made with [Quarto](https://quarto.org/) in DC.<br>[Website](https://rorylawless.com/) © 2026 by [Rory Lawless](about.qmd) is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
   search: false
   draft-mode: gone
   navbar:
