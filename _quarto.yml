@@ -7,6 +7,7 @@ project:
     - .well-known/
     - _redirects
     - _headers
+    - assets/fonts/
 website:
   description: "A personal website"
   site-url: https://rorylawless.com
@@ -54,6 +55,9 @@ format:
     linkcolor: "#183e4d"
     code-overflow: wrap
     email-obfuscation: references
-    include-after-body: html/analytics.html
+    include-before-body: html/skip-link.html
+    include-after-body:
+      - html/analytics.html
+      - html/a11y.html
 metadata-files:
   - drafts.yml
