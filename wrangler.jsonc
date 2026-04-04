@@ -12,6 +12,7 @@
     "placement": {
         "mode": "smart"
     },
+    "workers_dev": true,
     "routes": [
         {
             "pattern": "rorylawless.com",
