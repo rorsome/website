@@ -1,6 +1,6 @@
-# AGENTS.md
+# Agent Instructions
 
-Guidance for agents working on this repository.
+This file provides guidance to AI coding agents (including Claude Code) when working with code in this repository.
 
 ## What this is
 
@@ -33,6 +33,10 @@ assets/
   template.ejs       # EJS template for the post listing on the homepage
 html/
   analytics.html     # Simple Analytics script injection
+  a11y.html          # Accessibility enhancements (ARIA landmarks, roles)
+  skip-link.html     # Skip-to-content link injected into every page
+src/
+  index.js           # Cloudflare Worker entry point — lowercases URL paths before serving assets
 posts/               # Blog posts, each in its own subdirectory with index.qmd
   _metadata.yml      # Shared frontmatter defaults for all posts (freeze: auto)
 404.qmd              # Custom 404 page
@@ -118,6 +122,8 @@ To preview changes locally you would need Quarto and R installed, then run `quar
 - `html_handling: "auto-trailing-slash"` — URL normalisation (nested under `assets`)
 - `placement: { mode: "smart" }` — Cloudflare automatic edge placement
 - Custom domain: `rorylawless.com`
+- `run_worker_first: true` — `src/index.js` intercepts every request before the assets binding responds; it lowercases URL paths and issues a 301 redirect, then falls through to `env.ASSETS.fetch()`
+- Observability: full logs and traces enabled at 100% head sampling rate with persistence (viewable in the Cloudflare dashboard)
 
 URL redirects live in `_redirects` (Cloudflare syntax). Response headers live in `_headers` — currently used to set CORS headers and `Content-Type` for the PGP key endpoint at `/.well-known/openpgpkey/`.
 
