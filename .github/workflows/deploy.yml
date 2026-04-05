@@ -1,4 +1,6 @@
 name: Render and deploy website
+permissions:
+  contents: read
 on:
   push:
     branches:
