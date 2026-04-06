@@ -64,16 +64,16 @@ Output goes to `_site/` (generated, not committed). The `_freeze/` directory (co
 - Body text: `#070a0c`
 - Links: `#183e4d`
 
-**Typography** (defined in `_quarto.yml` and loaded via Google Fonts in `assets/custom.scss`):
+**Typography** (defined in `_quarto.yml` and self-hosted in `assets/custom.scss`):
 - Body font: Lato, 14pt
 - Navbar title: Playfair Display (applied via `.navbar-title` in SCSS)
 - Code highlighting: a11y style, with copy buttons enabled
 
 **Layout** (`assets/custom.scss`):
 - Max content width: `.navbar-container { width: 820px }` (viewport-capped)
-- Navbar title size: `font-size: 4vw` (viewport-relative)
+- Navbar title size: `font-size: clamp(1.25rem, 4vw, 3rem)` — responsive with accessible min/max bounds (WCAG 1.4.4)
 - `h2` elements: no bottom border, no bottom padding, 1rem top margin
-- Table cells: zero padding via `.table> :not(caption)>*>*`
+- Listing table cells: zero inline padding, 1rem block padding for touch targets (WCAG 2.5.5) via `.quarto-listing-table > :not(caption) > * > td`
 - Post listing: borderless table; date column is right-aligned
 
 **Post listing** (`assets/template.ejs`):
@@ -120,7 +120,6 @@ To preview changes locally you would need Quarto and R installed, then run `quar
 - Static assets served from `_site/`
 - `not_found_handling: "404-page"` — unmatched routes serve the rendered `404.html`
 - `html_handling: "auto-trailing-slash"` — URL normalisation (nested under `assets`)
-- `placement: { mode: "smart" }` — Cloudflare automatic edge placement
 - Custom domain: `rorylawless.com`
 - `run_worker_first: true` — `src/index.js` intercepts every request before the assets binding responds; it lowercases URL paths and issues a 301 redirect, then falls through to `env.ASSETS.fetch()`
 - Observability: full logs and traces enabled at 100% head sampling rate with persistence (viewable in the Cloudflare dashboard)
