@@ -30,6 +30,7 @@ _quarto.yml          # Master site configuration (colors, fonts, navbar, output 
 drafts.yml           # Controls draft post visibility (referenced by _quarto.yml)
 assets/
   custom.scss        # All custom styles — primary target for look and feel changes
+  fonts/             # Self-hosted WOFF2 files (Lato 300/400/700, Playfair Display 400-900)
   template.ejs       # EJS template for the post listing on the homepage
 html/
   analytics.html     # Simple Analytics script injection
@@ -37,6 +38,8 @@ html/
   skip-link.html     # Skip-to-content link injected into every page
 src/
   index.js           # Cloudflare Worker entry point — lowercases URL paths before serving assets
+tests/
+  index.test.js      # Worker unit tests (Node.js built-in runner); run with `npm test`
 posts/               # Blog posts, each in its own subdirectory with index.qmd
   _metadata.yml      # Shared frontmatter defaults for all posts (freeze: auto)
 404.qmd              # Custom 404 page
@@ -64,16 +67,16 @@ Output goes to `_site/` (generated, not committed). The `_freeze/` directory (co
 - Body text: `#070a0c`
 - Links: `#183e4d`
 
-**Typography** (defined in `_quarto.yml` and loaded via Google Fonts in `assets/custom.scss`):
+**Typography** (defined in `_quarto.yml`; fonts are self-hosted WOFF2 files in `assets/fonts/`, loaded via `@font-face` in `assets/custom.scss`):
 - Body font: Lato, 14pt
 - Navbar title: Playfair Display (applied via `.navbar-title` in SCSS)
 - Code highlighting: a11y style, with copy buttons enabled
 
 **Layout** (`assets/custom.scss`):
 - Max content width: `.navbar-container { width: 820px }` (viewport-capped)
-- Navbar title size: `font-size: 4vw` (viewport-relative)
+- Navbar title size: `font-size: clamp(1.25rem, 4vw, 3rem)` (viewport-relative with min/max bounds)
 - `h2` elements: no bottom border, no bottom padding, 1rem top margin
-- Table cells: zero padding via `.table> :not(caption)>*>*`
+- Listing table cells: `padding-inline: 0; padding-block: 1rem` via `.quarto-listing-table > :not(caption) > * > td`
 - Post listing: borderless table; date column is right-aligned
 
 **Post listing** (`assets/template.ejs`):
@@ -88,7 +91,7 @@ When changing look and feel, `assets/custom.scss` and `_quarto.yml` are the two 
 
 - `llms-txt: true` — Quarto generates an `llms.txt` file for LLM consumption
 - `email-obfuscation: references` — email addresses are obfuscated in rendered HTML
-- `draft-mode: gone` (set in `drafts.yml`, referenced via `metadata-files`) — drafts are fully excluded from output
+- `draft-mode: gone` — set directly in `_quarto.yml`; `drafts.yml` (pulled in via `metadata-files`) lists which posts are drafts (currently none)
 - `search: false` — site-wide search is disabled intentionally
 - `feed: true` (set in `index.qmd`) — an RSS feed is generated for the post listing
 - `anchor-sections: false` (set in `index.qmd`) — no anchor links on the homepage
@@ -100,9 +103,10 @@ When changing look and feel, `assets/custom.scss` and `_quarto.yml` are the two 
 The site is **never built locally** — CI handles it. The full pipeline runs on every push to `main`:
 
 1. Restore cached `_freeze/` and `node_modules/` (keyed by OS + hash of `package-lock.json` and all `.qmd` files)
-2. Set up R + renv (restores packages from `renv.lock`)
-3. Run `quarto render` → outputs to `_site/`
-4. Run `wrangler deploy` → uploads `_site/` to Cloudflare Workers
+2. Run `npm test` — Node.js built-in test runner, tests in `tests/index.test.js`
+3. Set up R + renv (restores packages from `renv.lock`)
+4. Run `quarto render` → outputs to `_site/`
+5. Run `wrangler deploy` → uploads `_site/` to Cloudflare Workers
 
 **Runner**: `blacksmith-4vcpu-ubuntu-2404-arm` (4-core ARM Ubuntu 24.04)
 
@@ -120,7 +124,6 @@ To preview changes locally you would need Quarto and R installed, then run `quar
 - Static assets served from `_site/`
 - `not_found_handling: "404-page"` — unmatched routes serve the rendered `404.html`
 - `html_handling: "auto-trailing-slash"` — URL normalisation (nested under `assets`)
-- `placement: { mode: "smart" }` — Cloudflare automatic edge placement
 - Custom domain: `rorylawless.com`
 - `run_worker_first: true` — `src/index.js` intercepts every request before the assets binding responds; it lowercases URL paths and issues a 301 redirect, then falls through to `env.ASSETS.fetch()`
 - Observability: full logs and traces enabled at 100% head sampling rate with persistence (viewable in the Cloudflare dashboard)
