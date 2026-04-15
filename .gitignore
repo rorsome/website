@@ -5,3 +5,4 @@ _site/
 .wrangler/
 node_modules/
 _freeze/
+*.local.json
