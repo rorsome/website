@@ -1,44 +1,27 @@
 {
-  "enabledPlugins": {
-    "context7@claude-plugins-official": true,
-    "cloudflare@cloudflare": true,
-    "frontend-design@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
-    "quarto@posit-dev-skills": true,
-    "code-review@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "linear@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true,
-    "figma@claude-plugins-official": false,
-    "skill-creator@claude-plugins-official": false,
-    "ralph-loop@claude-plugins-official": false,
-    "github@posit-dev-skills": false,
-    "posit-dev@posit-dev-skills": false,
-    "learning-opportunities@learning-opportunities": true,
-    "learning-opportunities-auto@learning-opportunities": true,
-    "orient@learning-opportunities": true,
-    "explanatory-output-style@claude-plugins-official": true,
-    "learning-output-style@claude-plugins-official": true,
-    "imessage@claude-plugins-official": false,
-    "r-skills@r-skills": false,
-    "r-lsp@r-skills": false,
-    "r-lib@posit-dev-skills": false,
-    "shiny@posit-dev-skills": false,
-    "open-source@posit-dev-skills": false
-  },
-  "worktree": {
-    "symlinkDirectories": ["node_modules", "renv/library"]
-  },
-  "permissions": {
-    "allow": [
-      "Bash(git:*)",
-      "Bash(gh:*)",
-      "Bash(npx wrangler tail:*)",
-      "Bash(npx wrangler deployments:*)"
-    ]
-  }
+    "enabledPlugins": {
+        "context7@claude-plugins-official": true,
+        "cloudflare@cloudflare": true,
+        "frontend-design@claude-plugins-official": true,
+        "github@claude-plugins-official": true,
+        "superpowers@claude-plugins-official": true,
+        "quarto@posit-dev-skills": true,
+        "code-review@claude-plugins-official": true,
+        "claude-md-management@claude-plugins-official": true,
+        "feature-dev@claude-plugins-official": true,
+        "code-simplifier@claude-plugins-official": true,
+        "linear@claude-plugins-official": true,
+        "security-guidance@claude-plugins-official": true,
+        "claude-code-setup@claude-plugins-official": true,
+        "learning-opportunities@learning-opportunities": true,
+        "learning-opportunities-auto@learning-opportunities": true,
+        "explanatory-output-style@claude-plugins-official": true,
+        "learning-output-style@claude-plugins-official": true
+    },
+    "worktree": {
+        "symlinkDirectories": [
+            "node_modules",
+            "renv/library"
+        ]
+    }
 }
